@@ -31,6 +31,6 @@ app.put('/mark/:id', mark)
 app.post('/update/:id', update)
 app.post('/update/:id', updatep)
 
-app.listen(process.env.APP_PORT, () => {
-    console.log("port started at port " + process.env.APP_PORT)
+app.listen(process.env.PORT || 80, () => {
+    console.log("port started at port " + process.env.PORT)
 })
