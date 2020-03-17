@@ -40,7 +40,7 @@ module.exports = {
         let sql = `UPDATE todos SET completed = ${body.completed} WHERE id = ${req.params.id}`
         db.query(sql, body, (err, results) => {
             if (err) {
-                console.log(err)
+                ////
             } else {
                 return res.json({
                     success: 1,

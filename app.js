@@ -27,7 +27,7 @@ app.post('/login', login)
 app.post('/todo', addtask)
 app.get('/todos/:user_id', gettodos)
 app.get('/delete/:id', deleteTask)
-app.post('/mark/:id', mark)
+app.put('/mark/:id', mark)
 app.post('/update/:id', update)
 app.post('/update/:id', updatep)
 

@@ -21,8 +21,9 @@ module.exports = {
        const body = req.body
        getUserLogin (body, (err, results) => {
             if(err) {
-               return res.status(500).send(err);
-               console.log(err)
+                return res.status(500).json({
+                    message: 'An error occured'
+                })
             }
 
             if(!results) {
