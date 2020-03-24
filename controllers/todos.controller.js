@@ -17,7 +17,8 @@ module.exports = {
                let sql = `SELECT id, task, date, time, completed FROM todos WHERE user_id = ${req.params.user_id}`;
                db.query(sql, (err, results) => {
                    if(err) {
-                  return res.status(500).json({message: "Sorry an error occured... try again"});
+                  return res.status(500).json({message: "Sorry an error occured... try again",
+                error: err});
                    }
                    return res.status(200).json({result: results})
                })

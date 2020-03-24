@@ -1,5 +1,5 @@
 const { getUserLogin } = require('../models/user.models')
-const { genSaltSync, hashSync, compareSync } = require("bcryptjs")
+const { genSaltSync, hashSync, compareSync  } = require("bcryptjs")
 const { sign } = require('jsonwebtoken')
 const { db } = require('../config/database')
 
@@ -17,42 +17,51 @@ module.exports = {
             return res.status(200).json({message: "Registration successful!!"})
         })
     },
-    login: (req, res, next) => {
-       const body = req.body
-       getUserLogin (body, (err, results) => {
-            if(err) {
-                return res.status(500).json({
-                    message: 'An error occured'
-                })
-            }
-
-            if(!results) {
-             return  res.json({
-                    success: 0,
-                    message: "Incorrect Email or Password"
-                })
-            }
-            const result = compareSync(body.password, results.password);
-            if(result){
-            results.password = undefined;
-            const jsontoken = sign({result: results}, "qwu28", {
-                expiresIn: "1h"
+    login: (req, res) => {
+        const { email, password } = req.body;
+        const userEmail = "SELECT * FROM users WHERE email = ?";
+        db.query(userEmail, [email], (error, results, fields) => {
+          if (error) {
+            res.json({
+              status: "error",
+              message: "please debug me!!!"
             });
-           return res.json({
-                success: 1,
-                message: "login success",
-                token: jsontoken,
-                result: results
-            });
-        } else {
-            return res.json({
-                success: 0,
-                message: "Incorrect Email or Password"
-            })
-    }
-    })
-},
-
+          } else {
+            if (results.length > 0) {
+              const match = compareSync(password, results[0].password);
+              if (match) {
+                const token = sign(
+                  { id: results[0].id, is_admin: results[0].is_admin },
+                  process.env.TOKEN_SECRET,
+                  {
+                    // expiresIn: "3600s" // 1min
+                    expiresIn: 60 * 24 // 24hours
+                  }
+                );
+                res
+                  .header("auth-token", token)
+                  .status(201)
+                  .json({
+                    token,
+                    status: "success",
+                    message: "logged in!",
+                    results
+                  });
+              } else {
+                res.json({
+                  status: "error",
+                  message: "Email and password does not match"
+                });
+              }
+            } else {
+              res.json({
+                status: "error",
+                message: "Email does not exits"
+              });
+            }
+          }
+        });
+      },
 update: (req, res, next) => {
     const body = req.body;
     let sql = `UPDATE users SET ? WHERE id = ${req.params.id}`
