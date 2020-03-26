@@ -7,15 +7,29 @@ const { db } = require('../config/database')
 module.exports = {
     register: (req, res, next) => {
      const body = req.body;
-     const salt = genSaltSync(10);
-     body.password = hashSync(body.password, salt)
-        let sql = `INSERT INTO users SET ?`;
-        db.query(sql, body, (err, results) => {
-            if(err) {
-           return res.status(500).json({message: "Sorry an error occured... try again"});
-            }
-            return res.status(200).json({message: "Registration successful!!"})
-        })
+     let checkEmail = `SELECT * FROM users where email = ?`
+     db.query(checkEmail, body.email, (error, result, fields) => {
+       if (error) {
+         throw error
+       }
+
+       if (result.length > 0) {
+         res.json({
+           message: "Sorry, this Email is already in use"
+         })
+       } else {
+         //register user now
+         const salt = genSaltSync(10);
+         body.password = hashSync(body.password, salt)
+            let sql = `INSERT INTO users SET ?`;
+            db.query(sql, body, (err, results) => {
+                if(err) {
+               return res.status(500).json({message: "Sorry an error occured... try again"});
+                }
+                return res.status(200).json({message: "Registration successful!!"})
+            })
+       }
+     })
     },
     login: (req, res) => {
         const { email, password } = req.body;
