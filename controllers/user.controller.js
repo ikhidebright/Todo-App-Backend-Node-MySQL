@@ -12,7 +12,6 @@ module.exports = {
        if (error) {
          throw error
        }
-
        if (result.length > 0) {
          res.json({
            message: "Sorry, this Email is already in use"
@@ -25,8 +24,20 @@ module.exports = {
             db.query(sql, body, (err, results) => {
                 if(err) {
                return res.status(500).json({message: "Sorry an error occured... try again"});
+                } else {
+                  let user = {
+                    id: results.insertId,
+                    username: req.body.username,
+                    email: req.body.email
+                  }
+                  const token = sign({ user: user }, process.env.TOKEN_SECRET, { expiresIn: 60 * 24 }); 
+                  return res.status(200).json({
+                    token,
+                    results,
+                    user,
+                    message: "Registration successful!!"
+                  })
                 }
-                return res.status(200).json({message: "Registration successful!!"})
             })
        }
      })
@@ -44,22 +55,19 @@ module.exports = {
             if (results.length > 0) {
               const match = compareSync(password, results[0].password);
               if (match) {
-                const token = sign(
-                  { id: results[0].id, is_admin: results[0].is_admin },
-                  process.env.TOKEN_SECRET,
-                  {
-                    // expiresIn: "3600s" // 1min
-                    expiresIn: 60 * 24 // 24hours
-                  }
-                );
+                const user = {
+                  id: results[0].id,
+                  username: results[0].username,
+                  email: results[0].email
+                }
+                const token = sign({ user: user }, process.env.TOKEN_SECRET, { expiresIn: 60 * 24 });
                 res
-                  .header("auth-token", token)
                   .status(201)
                   .json({
                     token,
                     status: "success",
                     message: "logged in!",
-                    results
+                    user
                   });
               } else {
                 res.json({
