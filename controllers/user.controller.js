@@ -23,7 +23,10 @@ module.exports = {
             let sql = `INSERT INTO users SET ?`;
             db.query(sql, body, (err, results) => {
                 if(err) {
-               return res.status(500).json({message: "Sorry an error occured... try again"});
+                console.log(err)
+               return res.status(500).json({
+                 message: "Sorry an error occured... try again"
+                });
                 } else {
                   let user = {
                     id: results.insertId,
