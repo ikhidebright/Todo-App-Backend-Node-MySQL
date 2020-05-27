@@ -12,9 +12,16 @@ module.exports = {
        if (error) {
          throw error
        }
-       if (result.length > 0) {
+       let usernameMatch = result.username === req.body.username;
+       if (usernameMatch) {
+         res
+         .status(201)
+         .json({
+           message: `Sorry Username ${req.body.username} is taken`
+         })
+       } else if (result.length > 0) {
          res.json({
-           message: "Sorry, this Email is already in use"
+           message: `Sorry, this Email is already in use`
          })
        } else {
          //register user now
@@ -34,7 +41,9 @@ module.exports = {
                     email: req.body.email
                   }
                   const token = sign({ user: user }, process.env.TOKEN_SECRET, { expiresIn: 60 * 24 }); 
-                  return res.status(200).json({
+                  return res
+                  .status(200)
+                  .json({
                     token,
                     results,
                     user,
