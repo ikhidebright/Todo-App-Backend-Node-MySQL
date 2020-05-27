@@ -12,14 +12,17 @@ module.exports = {
        if (error) {
          throw error
        }
+       
        let usernameMatch = result.username === req.body.username;
-       if (result.length > 0 && usernameMatch) {
+       if (usernameMatch) {
          res
          .status(201)
          .json({
            message: `Sorry Username ${req.body.username} is taken`
          })
-       } else if (result.length > 0) {
+       }
+       
+       if (result.length > 0) {
          res.json({
            message: `Sorry, this Email is already in use`
          })
