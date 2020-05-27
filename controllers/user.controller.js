@@ -13,7 +13,7 @@ module.exports = {
          throw error
        }
        let usernameMatch = result.username === req.body.username;
-       if (usernameMatch) {
+       if (result.length > 0 && usernameMatch) {
          res
          .status(201)
          .json({
